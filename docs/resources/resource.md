@@ -1,27 +1,29 @@
 ---
-page_title: "scaffolding_resource Resource - terraform-provider-scaffolding"
+page_title: "netlify_site Resource - terraform-provider-netlify"
 subcategory: ""
 description: |-
-  Sample resource in the Terraform provider scaffolding.
+  Resource to deploy sites to Netlify
 ---
 
-# Resource `scaffolding_resource`
+# Resource `netlify_site`
 
-Sample resource in the Terraform provider scaffolding.
+Resource to deploy sites to Netlify
 
 ## Example Usage
 
 ```terraform
-resource "scaffolding_resource" "example" {
-  sample_attribute = "foo"
+resource "netlify_site" "example" {
+  name = "foo"
+  custom_domain = "example.com"
+  source_url = "https://example.com/path/to/tarball"
 }
 ```
 
 ## Schema
 
+- **name** (String) The name of the site.
+- **source_url** (String) A URL that contains a tarball of the source to be deployed.
+- 
 ### Optional
 
-- **id** (String, Optional) The ID of this resource.
-- **sample_attribute** (String, Optional) Sample attribute.
-
-
+- **custom_domain** (String, Optional) The custom domain to deploy this site to
