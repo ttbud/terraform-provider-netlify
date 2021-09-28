@@ -2,13 +2,11 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/netlify/open-api/go/models"
 	"github.com/netlify/open-api/go/porcelain"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -160,28 +158,16 @@ func deploySource(meta *Meta, siteID string, sourceURL string) error {
 		return err
 	}
 
-	// Tarball should have a single directory that's the root of the repo
-	entries, err := os.ReadDir(unpackDir)
-	if err != nil {
-		return err
-	}
-	if len(entries) != 1 || !entries[0].IsDir() {
-		return fmt.Errorf("tarball at URL %s must contain exactly one top-level directory", sourceURL)
-	}
-	sourceDir := entries[0].Name()
-	absSourceDir := filepath.Join(unpackDir, sourceDir)
-
-	deployOptions := porcelain.DeployOptions{SiteID: siteID, Dir: absSourceDir}
+	deployOptions := porcelain.DeployOptions{SiteID: siteID, Dir: unpackDir}
 	deploy, err := meta.client.DeploySite(meta.netlifyCtx, deployOptions)
 	if err != nil {
 		return err
 	}
 
-	_, err = meta.client.WaitUntilDeployLive(meta.netlifyCtx, deploy, time.Minute * 10)
+	_, err = meta.client.WaitUntilDeployLive(meta.netlifyCtx, deploy, time.Minute*10)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-

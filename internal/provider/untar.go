@@ -40,7 +40,7 @@ func Untar(dest string, reader io.Reader) error {
 				if err := os.MkdirAll(target, 0755); err != nil {
 					return err
 				}
-			} else {
+			} else if err != nil {
 				return err
 			}
 		case tar.TypeReg:

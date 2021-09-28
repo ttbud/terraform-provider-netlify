@@ -15,12 +15,10 @@ type Meta struct {
 
 func NewMeta(ctx context.Context, version string, token string) *Meta {
 	authInfo := runtime.ClientAuthInfoWriterFunc(func(r runtime.ClientRequest, _ strfmt.Registry) error {
-		err := r.SetHeaderParam("User-Agent", "github.com/ttbud/terraform-netlify-provider " + version)
-		if err != nil {
+		if err := r.SetHeaderParam("User-Agent", "github.com/ttbud/terraform-netlify-provider "+version); err != nil {
 			return err
 		}
-		err = r.SetHeaderParam("Authorization", "Bearer " + token)
-		if err != nil {
+		if err := r.SetHeaderParam("Authorization", "Bearer "+token); err != nil {
 			return err
 		}
 		return nil

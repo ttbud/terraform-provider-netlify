@@ -1,14 +1,12 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/netlify/open-api/go/plumbing/operations"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
 
@@ -23,10 +21,10 @@ func init() {
 			meta := NewTestMeta()
 			filter := "terraform-test-"
 			var page int32
-			for page = 0;; page++ {
+			for page = 0; ; page++ {
 				params := &operations.ListSitesParams{
-					Filter: &filter,
-					Page: &page,
+					Filter:  &filter,
+					Page:    &page,
 					Context: meta.netlifyCtx,
 				}
 				sites, err := meta.client.ListSites(meta.netlifyCtx, params)
@@ -37,7 +35,7 @@ func init() {
 					break
 				}
 				for _, site := range sites {
-					log.Printf("Deleting site %s (%s)\n", site.Name, site.ID)
+					log.Printf("[INFO] Deleting site %s (%s)\n", site.Name, site.ID)
 					if err := meta.client.DeleteSite(meta.netlifyCtx, site.ID); err != nil {
 						return err
 					}
@@ -49,16 +47,21 @@ func init() {
 }
 
 func TestAccResourceSite(t *testing.T) {
-	meta := NewMeta(context.Background(), "test", os.Getenv("NETLIFY_TOKEN"))
+	meta := NewTestMeta()
 	siteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
+	newSiteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
 	resource.Test(t, resource.TestCase{
-		PreCheck: testAccPreCheck(t),
+		PreCheck:          testAccPreCheck(t),
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testVerifySitesDestroyed(meta),
 		Steps: []resource.TestStep{
 			{
 				Config: netlifySiteConfig(siteName),
 				Check:  testVerifySiteExists(siteName, meta),
+			},
+			{
+				Config: netlifySiteConfig(newSiteName),
+				Check:  testVerifySiteExists(newSiteName, meta),
 			},
 		},
 	})
@@ -76,6 +79,9 @@ func testVerifySiteExists(siteName string, meta *Meta) func(state *terraform.Sta
 			if err != nil {
 				return fmt.Errorf("site %s does not exist in netlify", res.Primary.ID)
 			}
+			if site.Name != siteName {
+				return fmt.Errorf("expected site name %s in netlify, found site name %s", siteName, site.Name)
+			}
 
 			resp, err := http.Get(site.URL)
 			if err != nil {
@@ -86,7 +92,7 @@ func testVerifySiteExists(siteName string, meta *Meta) func(state *terraform.Sta
 				return err
 			}
 			text := string(bytes)
-			if strings.Contains(text, "You need to enable Javascript to run this app") {
+			if strings.Contains(text, "You need to enable JavaScript to run this app") {
 				resp.Body.Close()
 				return nil
 			} else {
@@ -119,7 +125,7 @@ func netlifySiteConfig(siteName string) string {
 	return fmt.Sprintf(`
 resource "netlify_site" "example" {
 	name = "%s"
-	source_url = "https://github.com/ttbud/ttbud/tarball/0fd1df2188e120e00528321cdfb60f52c1a3a683"
+	source_url = "https://9626-216927660-gh.circle-artifacts.com/0/ttbud-web.tar.gz"
 }
 `, siteName)
 }
