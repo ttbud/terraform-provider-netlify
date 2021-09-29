@@ -36,7 +36,7 @@ func resourceSite() *schema.Resource {
 			},
 			"source_url": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				Description: "URL to a targz of the source to deploy." +
 					" Destination contents must be immutable, only changes to the URL will trigger a re-deploy",
 			},
@@ -46,8 +46,6 @@ func resourceSite() *schema.Resource {
 
 func resourceSiteCreate(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	meta := m.(*Meta)
-
-	sourceURL := d.Get("source_url").(string)
 
 	siteSetup := &models.SiteSetup{
 		Site: models.Site{
@@ -61,8 +59,11 @@ func resourceSiteCreate(_ context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
-	if err = deploySource(meta, site.ID, sourceURL); err != nil {
-		return diag.FromErr(err)
+	sourceURL, ok := d.GetOk("source_url")
+	if ok {
+		if err = deploySource(meta, site.ID, sourceURL.(string)); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	if err = applySiteProperties(d, site); err != nil {
