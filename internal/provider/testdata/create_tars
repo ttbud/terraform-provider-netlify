@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Create .tar.gz files for the test sites and put them in the serve/ directory
+script_dir=$(dirname "$(which "$0")")
+
+tar --create --gzip --file "$script_dir/serve/initial_site.tar.gz" --directory "$script_dir/initial_site" .
+tar --create --gzip --file "$script_dir/serve/updated_site.tar.gz" --directory "$script_dir/updated_site" .

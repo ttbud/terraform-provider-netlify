@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -50,24 +51,28 @@ func TestAccResourceSite(t *testing.T) {
 	meta := NewTestMeta()
 	siteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
 	newSiteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
+
+	server := httptest.NewServer(http.FileServer(http.Dir("internal/provider/testdata/serve")))
+	defer server.Close()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:          testAccPreCheck(t),
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testVerifySitesDestroyed(meta),
 		Steps: []resource.TestStep{
 			{
-				Config: netlifySiteConfig(siteName),
-				Check:  testVerifySiteExists(siteName, meta),
+				Config: netlifySiteConfig(siteName, server.URL+"/initial_site.tar.gz"),
+				Check:  testVerifySiteExists(siteName, "Initial Site", meta),
 			},
 			{
-				Config: netlifySiteConfig(newSiteName),
-				Check:  testVerifySiteExists(newSiteName, meta),
+				Config: netlifySiteConfig(newSiteName, server.URL+"/updated_site.tar.gz"),
+				Check:  testVerifySiteExists(newSiteName, "Updated Site", meta),
 			},
 		},
 	})
 }
 
-func testVerifySiteExists(siteName string, meta *Meta) func(state *terraform.State) error {
+func testVerifySiteExists(siteName string, expectedContent string, meta *Meta) func(state *terraform.State) error {
 
 	return func(s *terraform.State) error {
 		for _, res := range s.RootModule().Resources {
@@ -92,12 +97,12 @@ func testVerifySiteExists(siteName string, meta *Meta) func(state *terraform.Sta
 				return err
 			}
 			text := string(bytes)
-			if strings.Contains(text, "You need to enable JavaScript to run this app") {
+			if strings.Contains(text, expectedContent) {
 				resp.Body.Close()
 				return nil
 			} else {
 				resp.Body.Close()
-				return fmt.Errorf("site contents were not deployed")
+				return fmt.Errorf("could not find %s in response:\n%s\n", expectedContent, text)
 			}
 		}
 
@@ -121,11 +126,11 @@ func testVerifySitesDestroyed(meta *Meta) func(s *terraform.State) error {
 	}
 }
 
-func netlifySiteConfig(siteName string) string {
+func netlifySiteConfig(siteName string, sourceURL string) string {
 	return fmt.Sprintf(`
 resource "netlify_site" "example" {
 	name = "%s"
-	source_url = "https://9626-216927660-gh.circle-artifacts.com/0/ttbud-web.tar.gz"
+	source_url = "%s"
 }
-`, siteName)
+`, siteName, sourceURL)
 }
