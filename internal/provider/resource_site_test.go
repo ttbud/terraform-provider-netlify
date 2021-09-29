@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"path"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -52,7 +54,11 @@ func TestAccResourceSite(t *testing.T) {
 	siteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
 	newSiteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
 
-	server := httptest.NewServer(http.FileServer(http.Dir("internal/provider/testdata/serve")))
+	// go test uses a different working directory depending on whether you use a directory or package specification when
+	// choosing which tests to run, so we have to find the testdata directory based on our current file
+	_, filename, _, _ := runtime.Caller(0)
+	serveDir := path.Join(path.Dir(filename), "testdata", "serve")
+	server := httptest.NewServer(http.FileServer(http.Dir(serveDir)))
 	defer server.Close()
 
 	resource.Test(t, resource.TestCase{
