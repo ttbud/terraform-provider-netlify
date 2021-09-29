@@ -20,6 +20,9 @@ func resourceSite() *schema.Resource {
 		ReadContext:   resourceSiteRead,
 		UpdateContext: resourceSiteUpdate,
 		DeleteContext: resourceSiteDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -46,7 +49,6 @@ func resourceSite() *schema.Resource {
 
 func resourceSiteCreate(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	meta := m.(*Meta)
-
 	siteSetup := &models.SiteSetup{
 		Site: models.Site{
 			Name:         d.Get("name").(string),
@@ -75,7 +77,7 @@ func resourceSiteCreate(_ context.Context, d *schema.ResourceData, m interface{}
 
 func resourceSiteRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	meta := m.(*Meta)
-	siteID := d.Get("site_id").(string)
+	siteID := d.Id()
 
 	site, err := meta.client.GetSite(meta.netlifyCtx, siteID)
 	if err != nil {

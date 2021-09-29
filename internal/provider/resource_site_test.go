@@ -49,7 +49,7 @@ func init() {
 	})
 }
 
-func TestAccResourceSite(t *testing.T) {
+func TestAccResourceSite_basic(t *testing.T) {
 	meta := NewTestMeta()
 	siteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
 	newSiteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
@@ -73,6 +73,27 @@ func TestAccResourceSite(t *testing.T) {
 			{
 				Config: netlifySiteConfig(newSiteName, server.URL+"/updated_site.tar.gz"),
 				Check:  testVerifySiteExists(newSiteName, "Updated Site", meta),
+			},
+		},
+	})
+}
+
+func TestAccResourceSite_no_source_url(t *testing.T) {
+	meta := NewTestMeta()
+	siteName := "terraform-test-" + acctest.RandStringFromCharSet(15, acctest.CharSetAlphaNum)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          testAccPreCheck(t),
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testVerifySitesDestroyed(meta),
+		Steps: []resource.TestStep{
+			{
+				Config: netlifySiteConfigSansURL(siteName),
+			},
+			{
+				ResourceName:      "netlify_site.example",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -130,6 +151,14 @@ func testVerifySitesDestroyed(meta *Meta) func(s *terraform.State) error {
 
 		return nil
 	}
+}
+
+func netlifySiteConfigSansURL(siteName string) string {
+	return fmt.Sprintf(`
+resource "netlify_site" "example" {
+	name = "%s"
+}
+`, siteName)
 }
 
 func netlifySiteConfig(siteName string, sourceURL string) string {
