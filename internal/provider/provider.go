@@ -13,6 +13,7 @@ func init() {
 }
 
 func New(version string) func() *schema.Provider {
+	// Creating a new site frequently takes longer than the default 30 second timeout
 	NetlifyOpenApiClient.DefaultTimeout = 10 * time.Minute
 	return func() *schema.Provider {
 		return &schema.Provider{
