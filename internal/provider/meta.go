@@ -1,10 +1,10 @@
 package provider
 
 import (
+	"context"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/netlify/open-api/go/porcelain"
-	"github.com/netlify/open-api/go/porcelain/context"
 	NetlifyContext "github.com/netlify/open-api/go/porcelain/context"
 )
 
