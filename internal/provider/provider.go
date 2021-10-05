@@ -2,8 +2,10 @@ package provider
 
 import (
 	"context"
+	NetlifyOpenApiClient "github.com/go-openapi/runtime/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"time"
 )
 
 func init() {
@@ -11,6 +13,7 @@ func init() {
 }
 
 func New(version string) func() *schema.Provider {
+	NetlifyOpenApiClient.DefaultTimeout = 10 * time.Minute
 	return func() *schema.Provider {
 		return &schema.Provider{
 			Schema: map[string]*schema.Schema{
