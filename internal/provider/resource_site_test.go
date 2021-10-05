@@ -68,11 +68,11 @@ func TestAccResourceSite_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: netlifySiteConfig(siteName, server.URL+"/initial_site.tar.gz"),
-				Check:  testVerifySiteExists(siteName, "Initial Site", meta),
+				Check:  verifySiteContentExists(siteName, "Initial Site", meta),
 			},
 			{
 				Config: netlifySiteConfig(newSiteName, server.URL+"/updated_site.tar.gz"),
-				Check:  testVerifySiteExists(newSiteName, "Updated Site", meta),
+				Check:  verifySiteContentExists(newSiteName, "Updated Site", meta),
 			},
 		},
 	})
@@ -99,7 +99,7 @@ func TestAccResourceSite_no_source_url(t *testing.T) {
 	})
 }
 
-func testVerifySiteExists(siteName string, expectedContent string, meta *Meta) func(state *terraform.State) error {
+func verifySiteContentExists(siteName string, expectedContent string, meta *Meta) func(state *terraform.State) error {
 
 	return func(s *terraform.State) error {
 		for _, res := range s.RootModule().Resources {
