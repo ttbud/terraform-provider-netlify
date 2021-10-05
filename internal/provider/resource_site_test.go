@@ -64,7 +64,7 @@ func TestAccResourceSite_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          testAccPreCheck(t),
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testVerifySitesDestroyed(meta),
+		CheckDestroy:      verifySitesDestroyed(meta),
 		Steps: []resource.TestStep{
 			{
 				Config: netlifySiteConfig(siteName, server.URL+"/initial_site.tar.gz"),
@@ -85,7 +85,7 @@ func TestAccResourceSite_no_source_url(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          testAccPreCheck(t),
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testVerifySitesDestroyed(meta),
+		CheckDestroy:      verifySitesDestroyed(meta),
 		Steps: []resource.TestStep{
 			{
 				Config: netlifySiteConfigSansURL(siteName),
@@ -137,7 +137,7 @@ func verifySiteContentExists(siteName string, expectedContent string, meta *Meta
 	}
 }
 
-func testVerifySitesDestroyed(meta *Meta) func(s *terraform.State) error {
+func verifySitesDestroyed(meta *Meta) func(s *terraform.State) error {
 	return func(s *terraform.State) error {
 		for _, res := range s.RootModule().Resources {
 			if res.Type != "netlify_site" {
