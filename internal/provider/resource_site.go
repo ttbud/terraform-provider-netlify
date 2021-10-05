@@ -161,7 +161,7 @@ func deploySource(meta *Meta, siteID string, sourceURL string) error {
 		return err
 	}
 
-	deployOptions := porcelain.DeployOptions{SiteID: siteID, Dir: unpackDir}
+	deployOptions := porcelain.DeployOptions{SiteID: siteID, Dir: unpackDir, UploadTimeout: 10 * time.Minute}
 	deploy, err := meta.client.DeploySite(meta.netlifyCtx, deployOptions)
 	if err != nil {
 		return err
