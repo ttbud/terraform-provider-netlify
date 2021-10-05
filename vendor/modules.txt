@@ -143,7 +143,7 @@ github.com/go-openapi/jsonreference
 # github.com/go-openapi/loads v0.20.0
 ## explicit; go 1.13
 github.com/go-openapi/loads
-# github.com/go-openapi/runtime v0.19.24
+# github.com/go-openapi/runtime v0.19.31
 ## explicit; go 1.13
 github.com/go-openapi/runtime
 github.com/go-openapi/runtime/client
@@ -360,6 +360,11 @@ github.com/oklog/run
 # github.com/oklog/ulid v1.3.1
 ## explicit
 github.com/oklog/ulid
+# github.com/opentracing/opentracing-go v1.2.0
+## explicit; go 1.14
+github.com/opentracing/opentracing-go
+github.com/opentracing/opentracing-go/ext
+github.com/opentracing/opentracing-go/log
 # github.com/posener/complete v1.2.1
 ## explicit
 github.com/posener/complete
