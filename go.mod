@@ -7,7 +7,7 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.37.0 // indirect
 	github.com/go-openapi/runtime v0.19.31
-	github.com/go-openapi/strfmt v0.20.2
+	github.com/go-openapi/strfmt v0.20.3
 	github.com/hashicorp/hcl/v2 v2.8.2 // indirect
 	github.com/hashicorp/terraform-plugin-docs v0.5.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.8.0
