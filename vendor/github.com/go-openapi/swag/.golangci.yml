@@ -36,3 +36,15 @@ linters:
     - funlen
     - gci
     - gocognit
+    - paralleltest
+    - thelper
+    - ifshort
+    - gomoddirectives
+    - cyclop
+    - forcetypeassert
+    - ireturn
+    - tagliatelle
+    - varnamelen
+    - goimports
+    - tenv
+    - golint
