@@ -1,5 +1,3 @@
-// +build !go1.8
-
 // Copyright 2015 go-swagger maintainers
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internal
+package swag
 
-import "net/url"
+import "mime/multipart"
 
-// PathUnescape provides url.PathUnescape(), with seamless
-// go version support for pre-go1.8
-//
-// TODO: this function is currently defined in go-openapi/swag,
-// but unexported. We might chose to export it, or simple phase
-// out pre-go1.8 support.
-func PathUnescape(path string) (string, error) {
-	return url.QueryUnescape(path)
+// File represents an uploaded file.
+type File struct {
+	Data   multipart.File
+	Header *multipart.FileHeader
+}
+
+// Read bytes from the file
+func (f *File) Read(p []byte) (n int, err error) {
+	return f.Data.Read(p)
+}
+
+// Close the file
+func (f *File) Close() error {
+	return f.Data.Close()
 }
