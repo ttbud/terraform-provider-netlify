@@ -1,4 +1,4 @@
-// +build go1.8
+// +build !windows
 
 // Copyright 2015 go-swagger maintainers
 //
@@ -14,16 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internal
+package spec
 
-import "net/url"
+import (
+	"net/url"
+	"path/filepath"
+)
 
-// PathUnescape provides url.PathUnescape(), with seamless
-// go version support for pre-go1.8
+// absPath makes a file path absolute and compatible with a URI path component.
 //
-// TODO: this function is currently defined in go-openapi/swag,
-// but unexported. We might chose to export it, or simple phase
-// out pre-go1.8 support.
-func PathUnescape(path string) (string, error) {
-	return url.PathUnescape(path)
+// The parameter must be a path, not an URI.
+func absPath(in string) string {
+	anchored, err := filepath.Abs(in)
+	if err != nil {
+		specLogger.Printf("warning: could not resolve current working directory: %v", err)
+		return in
+	}
+	return anchored
+}
+
+func repairURI(in string) (*url.URL, string) {
+	u, _ := url.Parse("")
+	debugLog("repaired URI: original: %q, repaired: %q", in, "")
+	return u, ""
+}
+
+func fixWindowsURI(u *url.URL, in string) {
 }
